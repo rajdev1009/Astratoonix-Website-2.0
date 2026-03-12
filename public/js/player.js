@@ -15,27 +15,53 @@ function openPlayer(id, type) {
   const vip = isUserPremium();
   let html  = '';
 
+  // ── 1. नेटफ्लिक्स जैसी "More Like This" लिस्ट बनाना ──
+  let moreHtml = '';
   if (type === 'movie') {
-    if (item.isPremium && !vip) {
-      html = vipLockedHTML();
-    } else {
-      const link = item.links?.p480 || item.links?.p720 || item.links?.p1080 || item.links?.p4k || '';
-      html = `<div class="video-wrap" id="video-wrap">${link ? buildPlayer(link) : backdropThumb(item.backdrop||item.poster,'🎬')}</div>
-        <div class="player-info">
-          <div class="player-title">${item.title}</div>
-          <div class="player-sub">🎬 Movie &nbsp;·&nbsp; Choose Quality</div>
-          <div class="quality-btns">${qualityBtnsHTML(item.links)}</div>
-        </div>`;
+    const moreList = ATX.allContent.movies.filter(m => m._id !== id).slice(0, 10);
+    if (moreList.length > 0) {
+      moreHtml = `<div class="more-like-this">
+        <h3>🍿 More Movies</h3>
+        <div class="more-grid">
+          ${moreList.map(m => `<div class="more-item" onclick="openPlayer('${m._id}', 'movie')"><img src="${m.poster}" alt=""></div>`).join('')}
+        </div>
+      </div>`;
     }
   } else {
-    html = `<div class="video-wrap" id="video-wrap">${backdropThumb(item.poster,'📺')}</div>
-      <div class="player-info">
-        <div class="player-title">${item.title}</div>
+    const moreList = ATX.allContent.series.filter(s => s._id !== id).slice(0, 10);
+    if (moreList.length > 0) {
+      moreHtml = `<div class="more-like-this">
+        <h3>📺 More Series</h3>
+        <div class="more-grid">
+          ${moreList.map(s => `<div class="more-item" onclick="openPlayer('${s._id}', 'series')"><img src="${s.poster}" alt=""></div>`).join('')}
+        </div>
+      </div>`;
+    }
+  }
+
+  // ── 2. टॉप टाइटल हैडर (वीडियो के ऊपर) ──
+  const headerHtml = `<div class="player-header"><h2 class="player-top-title">${item.title}</h2></div>`;
+
+  // ── 3. लेआउट सेट करना (Header -> Video -> Info -> More Movies) ──
+  if (type === 'movie') {
+    if (item.isPremium && !vip) {
+      html = headerHtml + vipLockedHTML() + moreHtml;
+    } else {
+      const link = item.links?.p480 || item.links?.p720 || item.links?.p1080 || item.links?.p4k || '';
+      html = headerHtml + `<div class="video-wrap" id="video-wrap">${link ? buildPlayer(link) : backdropThumb(item.backdrop||item.poster,'🎬')}</div>
+        <div class="player-info" style="padding:15px;">
+          <div class="player-sub">🎬 Movie &nbsp;·&nbsp; Choose Quality</div>
+          <div class="quality-btns">${qualityBtnsHTML(item.links)}</div>
+        </div>` + moreHtml;
+    }
+  } else {
+    html = headerHtml + `<div class="video-wrap" id="video-wrap">${backdropThumb(item.poster,'📺')}</div>
+      <div class="player-info" style="padding:15px;">
         <div class="player-sub" id="ep-sub">📺 Series &nbsp;·&nbsp; Select Episode</div>
         <div class="quality-btns" id="ep-qbtns"></div>
       </div>
-      <div class="episodes-list">
-        <h4>Episodes</h4>
+      <div class="episodes-list" style="padding:0 15px;">
+        <h4 style="margin-bottom:10px;">Episodes</h4>
         ${(item.episodes||[]).map(ep => {
           const locked = ep.isPremium && !vip;
           const enc    = encodeURIComponent(JSON.stringify(ep));
@@ -45,7 +71,7 @@ function openPlayer(id, type) {
             <span class="ep-status">${locked?'🔒 VIP Only':'▶ Play'}</span>
           </div>`;
         }).join('')}
-      </div>`;
+      </div>` + moreHtml;
   }
 
   document.getElementById('player-inner').innerHTML = html;
