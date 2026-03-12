@@ -5,6 +5,13 @@ const bcrypt    = require('bcryptjs');
 const User      = require('../models/User');
 const adminAuth = require('../middleware/adminAuth');
 
+// ── Helper: Live Update Sender (नया फीचर) ─────────────────────────
+function emitUpdate(req, user) {
+  if (user && req.app.get('io')) {
+    req.app.get('io').emit('userUpdate', _safeUser(user));
+  }
+}
+
 // ── REGISTER ──────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
@@ -59,6 +66,7 @@ router.patch('/grant-days', adminAuth, async (req, res) => {
       { new: true }
     );
     if (!user) return res.status(404).json({ error: 'User not found: ' + email });
+    emitUpdate(req, user); // <-- Live Update
     res.json({ success: true, expiry });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -74,6 +82,7 @@ router.patch('/grant-lifetime', adminAuth, async (req, res) => {
       { new: true }
     );
     if (!user) return res.status(404).json({ error: 'User not found: ' + email });
+    emitUpdate(req, user); // <-- Live Update
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -83,8 +92,11 @@ router.patch('/:id/grant-days', adminAuth, async (req, res) => {
   try {
     const d      = parseInt(req.body.days) || 30;
     const expiry = new Date(Date.now() + d * 24 * 60 * 60 * 1000);
-    await User.findByIdAndUpdate(req.params.id,
-      { isPremium: true, isForever: false, planExpiry: expiry, vipGrantedAt: new Date(), isBlocked: false });
+    const user = await User.findByIdAndUpdate(req.params.id,
+      { isPremium: true, isForever: false, planExpiry: expiry, vipGrantedAt: new Date(), isBlocked: false },
+      { new: true }
+    );
+    emitUpdate(req, user); // <-- Live Update
     res.json({ success: true, expiry });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -92,8 +104,11 @@ router.patch('/:id/grant-days', adminAuth, async (req, res) => {
 // ── GRANT VIP by ID (Lifetime) ────────────────────────────────────
 router.patch('/:id/grant-lifetime', adminAuth, async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id,
-      { isPremium: true, isForever: true, planExpiry: null, vipGrantedAt: new Date(), isBlocked: false });
+    const user = await User.findByIdAndUpdate(req.params.id,
+      { isPremium: true, isForever: true, planExpiry: null, vipGrantedAt: new Date(), isBlocked: false },
+      { new: true }
+    );
+    emitUpdate(req, user); // <-- Live Update
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -101,8 +116,11 @@ router.patch('/:id/grant-lifetime', adminAuth, async (req, res) => {
 // ── REVOKE VIP (by email or ID) ───────────────────────────────────
 router.patch('/revoke/:id', adminAuth, async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id,
-      { isPremium: false, isForever: false, planExpiry: null });
+    const user = await User.findByIdAndUpdate(req.params.id,
+      { isPremium: false, isForever: false, planExpiry: null },
+      { new: true }
+    );
+    emitUpdate(req, user); // <-- Live Update
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -113,6 +131,7 @@ router.patch('/:id/block', adminAuth, async (req, res) => {
     const user = await User.findById(req.params.id);
     user.isBlocked = !user.isBlocked;
     await user.save();
+    emitUpdate(req, user); // <-- Live Update
     res.json({ success: true, isBlocked: user.isBlocked });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -120,7 +139,11 @@ router.patch('/:id/block', adminAuth, async (req, res) => {
 // ── SET TRIAL ─────────────────────────────────────────────────────
 router.patch('/:id/trial', adminAuth, async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id, { isTrial: true, isPremium: false, isForever: false });
+    const user = await User.findByIdAndUpdate(req.params.id, 
+      { isTrial: true, isPremium: false, isForever: false },
+      { new: true }
+    );
+    emitUpdate(req, user); // <-- Live Update
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
