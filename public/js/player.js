@@ -1,6 +1,12 @@
 // public/js/player.js — In-site video player
 
 function openPlayer(id, type) {
+  // FIX: अगर यूज़र ब्लॉक है, तो उसे प्लेयर खोलने ही मत दो
+  if (ATX.currentUser && ATX.currentUser.isBlocked) {
+    notify('🚨 You are blocked by Admin. You cannot watch anything.', 'error');
+    return;
+  }
+
   const item = type === 'movie'
     ? ATX.allContent.movies.find(m => m._id === id)
     : ATX.allContent.series.find(s => s._id === id);
