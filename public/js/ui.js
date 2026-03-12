@@ -1,7 +1,17 @@
 // public/js/ui.js — Modals, notifications, ads
 
 function openModal(id)  { document.getElementById(id)?.classList.add('active'); }
-function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+
+// FIX: प्लेयर बंद होते ही वीडियो को पूरी तरह रोक (Clear) दें
+function closeModal(id) { 
+  document.getElementById(id)?.classList.remove('active'); 
+  
+  // अगर प्लेयर वाला डिब्बा बंद हुआ है, तो अंदर का HTML (वीडियो) साफ कर दो ताकि बैकग्राउंड आवाज़ बंद हो जाए
+  if (id === 'player-modal') {
+    const playerInner = document.getElementById('player-inner');
+    if (playerInner) playerInner.innerHTML = '';
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.overlay').forEach(o => {
