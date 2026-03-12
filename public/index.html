@@ -8,7 +8,6 @@
 </head>
 <body>
 
-<!-- ── LIVE BANNER ─────────────────────────────── -->
 <div id="live-banner">
   <span class="live-dot"></span>
   <span style="color:var(--muted);letter-spacing:2px;">LIVE</span>
@@ -16,20 +15,17 @@
   <span style="color:var(--muted);letter-spacing:2px;">VIEWERS ONLINE</span>
 </div>
 
-<!-- ── USER BAR ────────────────────────────────── -->
 <div id="user-bar">
   <span class="user-bar-email" id="bar-email"></span>
   <span id="bar-status"></span>
   <button class="btn-small" onclick="logoutUser()">Logout</button>
 </div>
 
-<!-- ── HEADER ──────────────────────────────────── -->
 <header style="margin-top:32px;">
   <button id="logo-btn" onclick="openAdminPass()">AstraToonix</button>
   <p class="tagline">Stream the Universe · Neon · Dark · Unlimited</p>
 </header>
 
-<!-- ── NAV ─────────────────────────────────────── -->
 <nav>
   <button class="nav-btn active" onclick="filterContent('all',this)">🌐 All</button>
   <button class="nav-btn"        onclick="filterContent('movie',this)">🎬 Movies</button>
@@ -51,11 +47,6 @@
 
 <footer><p>© 2025 AstraToonix · All Rights Reserved</p></footer>
 
-<!-- ═══════════════════════════════════════════════
-     MODALS
-═══════════════════════════════════════════════ -->
-
-<!-- ADMIN PASSWORD -->
 <div class="overlay" id="admin-pass-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('admin-pass-modal')">✕</button>
@@ -72,7 +63,6 @@
   </div>
 </div>
 
-<!-- AUTH -->
 <div class="overlay" id="auth-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
@@ -90,7 +80,6 @@
   </div>
 </div>
 
-<!-- PLAYER -->
 <div class="overlay" id="player-modal">
   <div class="modal" style="max-width:880px;">
     <button class="modal-close" onclick="closeModal('player-modal')">✕</button>
@@ -98,7 +87,6 @@
   </div>
 </div>
 
-<!-- EDIT CONTENT MODAL -->
 <div class="overlay" id="edit-modal">
   <div class="modal" style="max-width:500px;">
     <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
@@ -114,7 +102,6 @@
   </div>
 </div>
 
-<!-- MASTER RESET MODAL -->
 <div class="overlay" id="reset-modal">
   <div class="modal" style="max-width:420px;">
     <button class="modal-close" onclick="closeModal('reset-modal')">✕</button>
@@ -139,9 +126,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     ADMIN PANEL (Full Screen)
-═══════════════════════════════════════════════ -->
 <div id="admin-panel">
   <div class="admin-header">
     <h1>⚙ AstraToonix Admin v3</h1>
@@ -161,12 +145,8 @@
       <button class="tab-btn"              onclick="switchTab('tab-analytics',this)">📊 Analytics</button>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB A: UPLOAD CONTENT
-    ════════════════════════════════ -->
     <div class="tab-content active" id="tab-content">
 
-      <!-- MOVIE FORM -->
       <div class="admin-form">
         <h3>🎬 Add Movie</h3>
         <div class="form-row">
@@ -189,7 +169,6 @@
         <button class="btn-red" id="save-movie-btn" onclick="saveMovie()" style="margin-top:6px;">💾 SAVE MOVIE</button>
       </div>
 
-      <!-- SERIES FORM -->
       <div class="admin-form">
         <h3>📺 Add Series</h3>
         <div class="form-row">
@@ -205,9 +184,6 @@
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB B: MANAGE CONTENT (Edit/Hide/Delete)
-    ════════════════════════════════ -->
     <div class="tab-content" id="tab-manage">
       <div class="admin-form">
         <h3>🗂 All Content — Edit · Hide · Delete</h3>
@@ -220,12 +196,8 @@
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB C: USER MANAGEMENT
-    ════════════════════════════════ -->
     <div class="tab-content" id="tab-users">
 
-      <!-- Stats row -->
       <div class="stat-cards">
         <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Users</div></div>
         <div class="stat-card"><div class="stat-num" id="stat-vip" style="color:var(--gold);">0</div><div class="stat-label">VIP Active</div></div>
@@ -233,7 +205,6 @@
         <div class="stat-card"><div class="stat-num" id="stat-expired" style="color:#ff6600;">0</div><div class="stat-label">Expired</div></div>
       </div>
 
-      <!-- Quick VIP grant by email -->
       <div class="admin-form" style="border-color:#2a2000;">
         <h3 style="color:var(--gold);">⭐ Quick VIP Grant by Email</h3>
         <p style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:12px;">
@@ -256,7 +227,6 @@
         </div>
       </div>
 
-      <!-- All users list -->
       <div class="admin-form">
         <h3>👥 All Users — Status · Grant · Block</h3>
         <p style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:14px;">
@@ -267,7 +237,6 @@
         </div>
       </div>
 
-      <!-- Danger zone -->
       <div class="danger-zone">
         <h3>⚠ DANGER ZONE</h3>
         <p>Yeh ALL user accounts delete karega.<br/>Movies, Series aur content safe rahega.<br/>Teen-step password confirm hoga.</p>
@@ -275,9 +244,6 @@
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB D: ANALYTICS
-    ════════════════════════════════ -->
     <div class="tab-content" id="tab-analytics">
       <div class="admin-form">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
@@ -292,7 +258,6 @@
         </div>
       </div>
 
-      <!-- Live count card -->
       <div class="admin-form">
         <h3>🌐 Real-time Live Viewers</h3>
         <div style="text-align:center;padding:20px 0;">
@@ -302,15 +267,8 @@
       </div>
     </div>
 
-  </div><!-- end admin-body -->
-</div><!-- end admin-panel -->
+  </div></div><div class="notify" id="notify"></div>
 
-<!-- NOTIFY TOAST -->
-<div class="notify" id="notify"></div>
-
-<!-- ═══════════════════════════════════════════════
-     SCRIPTS
-═══════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
 <script src="/js/config.js"></script>
@@ -343,6 +301,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (alc) alc.textContent = count;
     const anlc = document.getElementById('analytics-live');
     if (anlc) anlc.textContent = count;
+  });
+
+  // FIX: लाइव यूज़र स्टेटस अपडेट (बिना लॉगआउट किए)
+  socket.on('userUpdate', updatedUser => {
+    // अगर जिस यूज़र में चेंज हुआ है, वह यही यूज़र है
+    if (ATX.currentUser && ATX.currentUser.email === updatedUser.email) {
+      ATX.currentUser = updatedUser;
+      sessionStorage.setItem('atx_user', JSON.stringify(updatedUser)); // नया डेटा सेव
+      updateUserBar(); // ऊपर का बैज तुरंत बदलें
+      initAds(); // अगर VIP मिला है, तो Ads तुरंत हटा दें
+
+      if (updatedUser.isBlocked) {
+        closeModal('player-modal'); // अगर कोई मूवी देख रहा है, तो प्लेयर तुरंत बंद कर दें
+        notify('🚨 Admin blocked your account!', 'error');
+      } else {
+        notify('⭐ Your account status was updated by Admin!', 'success');
+      }
+    }
   });
 });
 </script>
