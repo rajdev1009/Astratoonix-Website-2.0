@@ -1,15 +1,15 @@
 // public/js/config.js — Global state & config
 
 const ATX = {
-  // यह चाबी बैकएंड के ADMIN_PASSWORD से मैच होनी चाहिए
-  ADMIN_PASSWORD: '782447',
+  // FIX: पासवर्ड यहाँ से हटा दिया गया है। 
+  // अब यह सिर्फ आपके टाइप करने पर मेमोरी में आएगा और Koyeb के .env से चेक होगा।
+  ADMIN_PASSWORD: '',
 
   // User State
   currentUser: JSON.parse(sessionStorage.getItem('atx_user') || 'null'),
 
   /* FIX: adminUnlocked को हमेशा 'false' रखा है।
      इससे जब भी आप लोगो पर क्लिक करेंगे, सिस्टम आपसे नया पासवर्ड मांगेगा।
-     sessionStorage का इस्तेमाल यहाँ बंद कर दिया गया है ताकि सुरक्षा बनी रहे।
   */
   adminUnlocked: false,
 
