@@ -75,15 +75,21 @@ function addEpisode() {
   const div  = document.createElement('div');
   div.className = 'ep-card';
   div.id        = 'ep-card-' + n;
+  
+  // FIX: यहाँ Title और Poster दोनों का इनपुट बॉक्स जोड़ा गया है
   div.innerHTML = `
     <div class="ep-card-header">
       <span class="ep-num">Episode #${n}</span>
       <button class="btn-remove-ep" onclick="removeEpisode(${n})">✕ Remove</button>
     </div>
-    <div class="form-row single" style="margin-bottom:8px;">
+    <div class="form-row" style="margin-bottom:8px;">
       <div class="form-field">
-        <label>🖼 Poster URL (Episode #${n})</label>
-        <input type="text" id="e${n}-poster" placeholder="https://... (thumbnail for this episode)"/>
+        <label>📝 Episode Title (Optional)</label>
+        <input type="text" id="e${n}-title" placeholder="e.g. The Beginning"/>
+      </div>
+      <div class="form-field">
+        <label>🖼 Poster URL</label>
+        <input type="text" id="e${n}-poster" placeholder="https://..."/>
       </div>
     </div>
     <div class="quality-grid">
@@ -140,8 +146,10 @@ async function saveSeries() {
   const episodes = [];
   cards.forEach((card, i) => {
     const n = card.id.replace('ep-card-', '');
+    // FIX: यहाँ title को भी सेव करने का कोड डाला गया है
     episodes.push({
       number:    i + 1,
+      title:     document.getElementById('e'+n+'-title')?.value.trim()  || '',
       poster:    document.getElementById('e'+n+'-poster')?.value.trim() || '',
       isPremium: document.getElementById('e'+n+'-premium')?.checked     || false,
       links: {
