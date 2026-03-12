@@ -2,22 +2,42 @@
 
 // ── UNLOCK ──────────────────────────────────────────────────────
 function openAdminPass() {
-  if (ATX.adminUnlocked) { openAdminPanel(); return; }
+  // ATX.adminUnlocked चेक हटा दिया है ताकि हर बार बॉक्स खुले
   document.getElementById('ap-input').value = '';
   document.getElementById('ap-msg').textContent = '';
   openModal('admin-pass-modal');
   setTimeout(() => document.getElementById('ap-input').focus(), 100);
 }
 
-function checkAdminPass() {
+// FIX: Backend से पासवर्ड वेरीफाई करना
+async function checkAdminPass() {
   const val = document.getElementById('ap-input').value.trim();
-  if (val === ATX.ADMIN_PASSWORD) {
-    ATX.adminUnlocked = true;
-    sessionStorage.setItem('atx_admin', '1');
-    closeModal('admin-pass-modal');
-    openAdminPanel();
-  } else {
-    document.getElementById('ap-msg').textContent = '❌ Wrong password. Access denied.';
+  const btn = document.querySelector('#admin-pass-modal .btn-red');
+  const msg = document.getElementById('ap-msg');
+
+  if (!val) { msg.textContent = '❌ Please enter password'; return; }
+
+  btn.textContent = 'Checking...'; btn.disabled = true;
+  
+  // Backend को पासवर्ड भेजें चेक करने के लिए (dummy request to check token)
+  try {
+    const res = await fetch('/api/users', { 
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': val } 
+    });
+    
+    if (res.ok) {
+      // पासवर्ड सही है
+      ATX.ADMIN_PASSWORD = val; // API कॉल्स के लिए चाबी सेट कर दी
+      ATX.adminUnlocked = true;
+      closeModal('admin-pass-modal');
+      openAdminPanel();
+    } else {
+      msg.textContent = '❌ Wrong password. Access denied.';
+    }
+  } catch (e) {
+    msg.textContent = '❌ Server error. Try again.';
+  } finally {
+    btn.textContent = 'UNLOCK PANEL'; btn.disabled = false;
   }
 }
 
@@ -25,7 +45,13 @@ function openAdminPanel() {
   document.getElementById('admin-panel').classList.add('active');
   switchTab('tab-content', document.querySelector('.tab-btn.first'));
 }
-function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); }
+
+function closeAdmin() { 
+  document.getElementById('admin-panel').classList.remove('active'); 
+  // FIX: पैनल बंद करते ही एडमिन लॉक और चाबी डिलीट
+  ATX.adminUnlocked = false;
+  ATX.ADMIN_PASSWORD = ''; 
+}
 
 function switchTab(tabId, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
