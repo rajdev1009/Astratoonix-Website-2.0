@@ -28,4 +28,5 @@ userSchema.methods.getStatus = function () {
   return 'free';
 };
 
-module.exports = mongoose.model('User', userSchema);
+// FIX: 'astratoonix_users' नाम की बिल्कुल नई और साफ कलेक्शन बनेगी
+module.exports = mongoose.model('User', userSchema, 'astratoonix_users');
