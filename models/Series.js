@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const episodeSchema = new mongoose.Schema({
   number:    { type: Number, required: true },
+  title:     { type: String, default: '' }, // FIX: एपिसोड का नाम सेव करने के लिए
   poster:    { type: String, default: '' },
   isPremium: { type: Boolean, default: false },
   links: {
