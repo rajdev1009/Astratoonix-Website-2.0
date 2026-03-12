@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AstraToonix — Stream the Universe</title>
+<link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+
+<!-- ── LIVE BANNER ─────────────────────────────── -->
+<div id="live-banner">
+  <span class="live-dot"></span>
+  <span style="color:var(--muted);letter-spacing:2px;">LIVE</span>
+  <span id="live-count">0</span>
+  <span style="color:var(--muted);letter-spacing:2px;">VIEWERS ONLINE</span>
+</div>
+
+<!-- ── USER BAR ────────────────────────────────── -->
+<div id="user-bar">
+  <span class="user-bar-email" id="bar-email"></span>
+  <span id="bar-status"></span>
+  <button class="btn-small" onclick="logoutUser()">Logout</button>
+</div>
+
+<!-- ── HEADER ──────────────────────────────────── -->
+<header style="margin-top:32px;">
+  <button id="logo-btn" onclick="openAdminPass()">AstraToonix</button>
+  <p class="tagline">Stream the Universe · Neon · Dark · Unlimited</p>
+</header>
+
+<!-- ── NAV ─────────────────────────────────────── -->
+<nav>
+  <button class="nav-btn active" onclick="filterContent('all',this)">🌐 All</button>
+  <button class="nav-btn"        onclick="filterContent('movie',this)">🎬 Movies</button>
+  <button class="nav-btn"        onclick="filterContent('series',this)">📺 Series</button>
+  <button class="nav-btn" id="auth-btn" onclick="openAuth()">👤 Login / Register</button>
+</nav>
+
+<div class="ad-zone"><div id="ad-top"></div></div>
+
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="search-input" placeholder="Search movies, series..." oninput="handleSearch(this.value)"/>
+</div>
+
+<main><div id="combined-grid"></div></main>
+
+<div class="ad-zone"><div id="ad-mid"></div></div>
+<div class="ad-zone"><div id="ad-bottom"></div></div>
+
+<footer><p>© 2025 AstraToonix · All Rights Reserved</p></footer>
+
+<!-- ═══════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════ -->
+
+<!-- ADMIN PASSWORD -->
+<div class="overlay" id="admin-pass-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('admin-pass-modal')">✕</button>
+    <div class="auth-inner">
+      <h2>🔐 ADMIN ACCESS</h2>
+      <div class="form-group">
+        <label>Admin Password</label>
+        <input type="password" id="ap-input" placeholder="Enter admin password..."
+          onkeydown="if(event.key==='Enter')checkAdminPass()"/>
+      </div>
+      <button class="btn-red" onclick="checkAdminPass()">UNLOCK PANEL</button>
+      <p class="msg error" id="ap-msg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="overlay" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
+    <div class="auth-inner">
+      <h2 id="auth-title">LOGIN</h2>
+      <div class="form-group"><label>Email</label><input type="email" id="auth-email" placeholder="you@gmail.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="auth-password" placeholder="••••••••"/></div>
+      <button class="btn-red" onclick="submitAuth()">CONTINUE</button>
+      <p class="msg" id="auth-msg"></p>
+      <div class="auth-switch">
+        <span id="auth-switch-text">New user?</span>
+        <a onclick="toggleAuthMode()"><span id="auth-switch-link"> Register here</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER -->
+<div class="overlay" id="player-modal">
+  <div class="modal" style="max-width:880px;">
+    <button class="modal-close" onclick="closeModal('player-modal')">✕</button>
+    <div id="player-inner"></div>
+  </div>
+</div>
+
+<!-- EDIT CONTENT MODAL -->
+<div class="overlay" id="edit-modal">
+  <div class="modal" style="max-width:500px;">
+    <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    <div class="edit-inner">
+      <h2>✏ EDIT CONTENT</h2>
+      <input type="hidden" id="edit-id"/>
+      <input type="hidden" id="edit-type"/>
+      <div class="form-group"><label>Title</label><input type="text" id="edit-title"/></div>
+      <div class="form-group"><label>Poster URL</label><input type="text" id="edit-poster" placeholder="https://..."/></div>
+      <button class="btn-red" style="margin-top:8px;" onclick="saveEdit()">💾 SAVE CHANGES</button>
+      <p class="msg" id="edit-msg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- MASTER RESET MODAL -->
+<div class="overlay" id="reset-modal">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" onclick="closeModal('reset-modal')">✕</button>
+    <div class="reset-inner">
+      <h2>⚠ MASTER RESET</h2>
+      <p>Yeh action <strong style="color:#ff2244;">SABHI user accounts</strong> delete kar dega.<br/>Movies aur Series <strong style="color:var(--green);">safe rahenge.</strong><br/>Teen steps complete karo:</p>
+      <div class="reset-step">
+        <label>Step 1 — Action Password 1</label>
+        <input type="password" id="r-pass1" placeholder="Action Password 1..."/>
+      </div>
+      <div class="reset-step">
+        <label>Step 2 — Action Password 2</label>
+        <input type="password" id="r-pass2" placeholder="Action Password 2..."/>
+      </div>
+      <div class="reset-step">
+        <label>Step 3 — Type exactly: <strong style="color:#ff2244;">DELETE ALL</strong></label>
+        <input type="text" id="r-confirm" placeholder="DELETE ALL"/>
+      </div>
+      <button class="btn-danger" style="margin-top:10px;width:100%;" onclick="doMasterReset()">🗑 WIPE ALL USERS</button>
+      <p class="msg error" id="r-msg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ADMIN PANEL (Full Screen)
+═══════════════════════════════════════════════ -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <h1>⚙ AstraToonix Admin v3</h1>
+    <div class="admin-live">
+      <span class="live-dot"></span>
+      <span style="color:var(--muted);font-size:10px;">LIVE</span>
+      <span class="admin-live-count" id="admin-live-count">0</span>
+    </div>
+    <button class="btn-small" onclick="closeAdmin()">✕ Close</button>
+  </div>
+
+  <div class="admin-body">
+    <div class="admin-tabs">
+      <button class="tab-btn first active" onclick="switchTab('tab-content',this)">📦 Content</button>
+      <button class="tab-btn"              onclick="switchTab('tab-manage',this)">🗂 Manage</button>
+      <button class="tab-btn"              onclick="switchTab('tab-users',this)">👥 Users</button>
+      <button class="tab-btn"              onclick="switchTab('tab-analytics',this)">📊 Analytics</button>
+    </div>
+
+    <!-- ════════════════════════════════
+         TAB A: UPLOAD CONTENT
+    ════════════════════════════════ -->
+    <div class="tab-content active" id="tab-content">
+
+      <!-- MOVIE FORM -->
+      <div class="admin-form">
+        <h3>🎬 Add Movie</h3>
+        <div class="form-row">
+          <div class="form-field"><label>Title *</label><input type="text"   id="m-title"   placeholder="Movie title"/></div>
+          <div class="form-field"><label>Poster URL *</label><input type="text" id="m-poster" placeholder="https://..."/></div>
+        </div>
+        <div class="form-row single">
+          <div class="form-field"><label>Backdrop URL (optional)</label><input type="text" id="m-backdrop" placeholder="https://..."/></div>
+        </div>
+        <div class="quality-grid">
+          <div class="form-field"><label>480p Link</label><input  type="text" id="m-480"  placeholder="https://..."/></div>
+          <div class="form-field"><label>720p Link</label><input  type="text" id="m-720"  placeholder="https://..."/></div>
+          <div class="form-field"><label>1080p Link</label><input type="text" id="m-1080" placeholder="https://..."/></div>
+          <div class="form-field"><label>4K Link</label><input    type="text" id="m-4k"   placeholder="https://..."/></div>
+        </div>
+        <div class="toggle-wrap">
+          <label class="toggle"><input type="checkbox" id="m-premium"/><span class="slider"></span></label>
+          <span style="font-size:13px;letter-spacing:1px;">Premium (VIP Only)</span>
+        </div>
+        <button class="btn-red" id="save-movie-btn" onclick="saveMovie()" style="margin-top:6px;">💾 SAVE MOVIE</button>
+      </div>
+
+      <!-- SERIES FORM -->
+      <div class="admin-form">
+        <h3>📺 Add Series</h3>
+        <div class="form-row">
+          <div class="form-field"><label>Title *</label><input type="text"   id="s-title"  placeholder="Series title"/></div>
+          <div class="form-field"><label>Main Poster URL *</label><input type="text" id="s-poster" placeholder="https://..."/></div>
+        </div>
+        <p style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:8px;">
+          ℹ Har Episode ka alag Poster + 4 Quality Links daal sakte ho
+        </p>
+        <div id="ep-list"></div>
+        <button class="btn-add-ep" onclick="addEpisode()">+ Add Episode</button>
+        <button class="btn-red" id="save-series-btn" onclick="saveSeries()">💾 SAVE SERIES</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         TAB B: MANAGE CONTENT (Edit/Hide/Delete)
+    ════════════════════════════════ -->
+    <div class="tab-content" id="tab-manage">
+      <div class="admin-form">
+        <h3>🗂 All Content — Edit · Hide · Delete</h3>
+        <p style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:14px;">
+          ✏ Edit = Title/Poster badlo &nbsp;|&nbsp; 👁 Hide = Public se chupaao (delete nahi hoga) &nbsp;|&nbsp; 🗑 Delete = Hamesha ke liye hatao
+        </p>
+        <div class="content-table" id="content-table">
+          <p style="color:var(--muted);font-size:13px;">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         TAB C: USER MANAGEMENT
+    ════════════════════════════════ -->
+    <div class="tab-content" id="tab-users">
+
+      <!-- Stats row -->
+      <div class="stat-cards">
+        <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Users</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-vip" style="color:var(--gold);">0</div><div class="stat-label">VIP Active</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-blocked" style="color:#ff2244;">0</div><div class="stat-label">Blocked</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-expired" style="color:#ff6600;">0</div><div class="stat-label">Expired</div></div>
+      </div>
+
+      <!-- Quick VIP grant by email -->
+      <div class="admin-form" style="border-color:#2a2000;">
+        <h3 style="color:var(--gold);">⭐ Quick VIP Grant by Email</h3>
+        <p style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:12px;">
+          Jis user ne premium kharida — uska email daal ke directly VIP do
+        </p>
+        <div class="vip-form">
+          <h4>Grant Premium Access</h4>
+          <div class="vip-input-row">
+            <input type="email" id="vip-email" placeholder="user@gmail.com"/>
+            <select id="vip-type" style="background:var(--dark2);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:4px;font-size:13px;outline:none;cursor:pointer;">
+              <option value="days">Days-Based</option>
+              <option value="lifetime">Lifetime ♾</option>
+            </select>
+            <input type="number" id="vip-days" value="30" min="1" max="365"
+              style="width:70px;background:var(--dark2);border:1px solid var(--border);color:#fff;padding:9px 11px;border-radius:4px;font-size:13px;outline:none;text-align:center;"
+              placeholder="Days"/>
+            <button class="btn-gold" onclick="grantByEmail()">⭐ GRANT</button>
+          </div>
+          <p id="vip-email-msg" style="font-size:12px;margin-top:8px;min-height:14px;letter-spacing:1px;"></p>
+        </div>
+      </div>
+
+      <!-- All users list -->
+      <div class="admin-form">
+        <h3>👥 All Users — Status · Grant · Block</h3>
+        <p style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:14px;">
+          ⭐ Days = X din ke liye VIP &nbsp;|&nbsp; ♾ Lifetime = Hamesha ke liye VIP &nbsp;|&nbsp; 🔴 Block = Login band
+        </p>
+        <div class="user-table" id="user-table">
+          <p style="color:var(--muted);font-size:13px;">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="danger-zone">
+        <h3>⚠ DANGER ZONE</h3>
+        <p>Yeh ALL user accounts delete karega.<br/>Movies, Series aur content safe rahega.<br/>Teen-step password confirm hoga.</p>
+        <button class="btn-danger" onclick="openResetModal()">🗑 MASTER RESET</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         TAB D: ANALYTICS
+    ════════════════════════════════ -->
+    <div class="tab-content" id="tab-analytics">
+      <div class="admin-form">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <h3 style="margin-bottom:0;">🔍 Search History</h3>
+          <button class="btn-small" onclick="clearAllSearchLogs()">Clear All</button>
+        </div>
+        <p style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:16px;">
+          Users kya search kar rahe hain — isko dekh ke decide karo next content kya add karna hai
+        </p>
+        <div class="search-log-grid" id="search-log-grid">
+          <p style="color:var(--muted);font-size:13px;">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Live count card -->
+      <div class="admin-form">
+        <h3>🌐 Real-time Live Viewers</h3>
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-family:Orbitron,monospace;font-size:52px;font-weight:700;color:var(--green);" id="analytics-live">0</div>
+          <div style="font-size:11px;letter-spacing:3px;color:var(--muted);margin-top:6px;">USERS ONLINE RIGHT NOW</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end admin-body -->
+</div><!-- end admin-panel -->
+
+<!-- NOTIFY TOAST -->
+<div class="notify" id="notify"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/ui.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/content.js"></script>
+<script src="/js/player.js"></script>
+<script src="/js/admin.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore admin session
+  if (sessionStorage.getItem('atx_admin') === '1') ATX.adminUnlocked = true;
+
+  updateUserBar();
+  loadContent();
+  initAds();
+
+  // ── Socket.io — Real-time live count ──────────────
+  const socket = io();
+  window._socket = socket;
+
+  socket.on('liveCount', count => {
+    // Update banner
+    const lc = document.getElementById('live-count');
+    if (lc) lc.textContent = count;
+    // Update admin panel
+    const alc = document.getElementById('admin-live-count');
+    if (alc) alc.textContent = count;
+    const anlc = document.getElementById('analytics-live');
+    if (anlc) anlc.textContent = count;
+  });
+});
+</script>
+</body>
+</html>
